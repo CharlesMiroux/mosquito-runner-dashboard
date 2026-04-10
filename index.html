@@ -160,6 +160,23 @@
     .badge.paused{background:var(--yellow-soft);color:var(--yellow)}
 
     /* ── BUDGET ── */
+    /* ── IG ORGANICO ── */
+    .ig-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+    .ig-post-table{width:100%;border-collapse:collapse;font-size:12px}
+    .ig-post-table th{text-align:left;padding:10px 12px;color:var(--gray-500);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+    .ig-post-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+    .ig-post-table tr:hover td{background:rgba(255,255,255,.015)}
+    .ig-tipo{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+    .ig-tipo.Reel{background:rgba(236,72,153,.15);color:#EC4899}
+    .ig-tipo.Historia{background:rgba(59,130,246,.15);color:#3B82F6}
+    .ig-tipo.Carrusel{background:rgba(245,158,11,.15);color:#F59E0B}
+    .ig-tipo.Post{background:rgba(132,204,22,.15);color:#84CC16}
+    .ig-bar-wrap{display:flex;align-items:center;gap:8px}
+    .ig-bar{height:5px;border-radius:3px;background:var(--surface);flex:1;overflow:hidden}
+    .ig-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--magenta),var(--purple))}
+    .ig-snapshot-info{font-size:11px;color:var(--gray-500);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+    .ig-snapshot-dot{width:6px;height:6px;border-radius:50%;background:var(--magenta)}
+    .ig-growth-chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:20px}
     .budget-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px}
     .budget-track{height:16px;background:var(--surface);border-radius:8px;overflow:hidden;margin:14px 0;position:relative}
     .budget-fill{height:100%;border-radius:8px;transition:width 1.5s cubic-bezier(.22,1,.36,1);background:linear-gradient(90deg,var(--orange),var(--amber));box-shadow:0 0 16px rgba(255,89,0,.3)}
@@ -286,6 +303,7 @@
   <button class="nav-tab" onclick="swTab('analytics',this)"><span class="nav-icon" style="color:var(--cyan)">&#9679;</span>Analytics</button>
   <button class="nav-tab" onclick="swTab('budget',this)"><span class="nav-icon" style="color:var(--amber)">&#9679;</span>Presupuesto</button>
   <button class="nav-tab" onclick="swTab('recs',this)"><span class="nav-icon" style="color:var(--purple)">&#9679;</span>Insights</button>
+  <button class="nav-tab" onclick="swTab('ig',this)"><span class="nav-icon" style="color:var(--magenta)">&#9679;</span>IG Orgánico</button>
 </nav>
 
 <main class="main">
@@ -408,6 +426,60 @@
       <div class="kpi c-cyan"><div class="kpi-label">Baja / Positiva</div><div class="kpi-value" id="rl" style="color:var(--cyan)">0</div></div>
     </div>
     <div class="rec-list" id="rec-list"></div>
+  </section>
+
+  <!-- ═══════ IG ORGÁNICO ═══════ -->
+  <section class="section" id="tab-ig">
+    <div class="section-header">
+      <h2>Instagram Orgánico</h2>
+      <p>Rendimiento de contenido propio — sin inversión publicitaria</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="ig-kpis" id="ig-kpis"></div>
+
+    <!-- Snapshot info -->
+    <div class="ig-snapshot-info">
+      <div class="ig-snapshot-dot"></div>
+      <span id="ig-period-label">Último período disponible · Datos de Meta Business Suite</span>
+    </div>
+
+    <!-- Top Posts Table -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border)">
+        <div class="chart-title">Contenido publicado</div>
+        <div class="chart-sub">Ordenado por visualizaciones</div>
+      </div>
+      <div style="overflow-x:auto;padding:0 0 4px">
+        <table class="ig-post-table" id="ig-posts-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Publicación</th>
+              <th>Fecha</th>
+              <th>Visualizaciones</th>
+              <th>Alcance</th>
+              <th>Interacciones</th>
+            </tr>
+          </thead>
+          <tbody id="ig-posts-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Growth Chart placeholder -->
+    <div class="ig-growth-chart-wrap">
+      <div class="chart-title">Evolución Histórica</div>
+      <div class="chart-sub" style="margin-bottom:16px">Visualizaciones y alcance por fecha de publicación</div>
+      <div style="position:relative;height:220px"><canvas id="ig-chart"></canvas></div>
+    </div>
+
+    <!-- Historical snapshots table -->
+    <div class="card" style="padding:24px;margin-top:20px">
+      <div class="chart-title" style="margin-bottom:4px">Control Histórico de Cuenta</div>
+      <div class="chart-sub" style="margin-bottom:16px">Snapshots semanales — actualiza manualmente en Google Sheets pestaña <code style="background:rgba(255,255,255,.06);padding:1px 6px;border-radius:4px">InstagramOrganico</code></div>
+      <div id="ig-history-table"></div>
+    </div>
   </section>
 </main>
 
@@ -1043,11 +1115,95 @@ function sortC(col){
 function filterC(q){document.querySelectorAll('#camp-tb tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
 
 // ═══════════════════════════════════════════════
+// IG ORGÁNICO — datos hardcoded + Google Sheets histórico
+// ═══════════════════════════════════════════════
+const IG_ACCOUNT = {
+  periodo: '12 mar 2026 – 8 abr 2026',
+  visualizaciones: 49700,
+  alcance: 34600,
+  interacciones: 1100,
+  nuevos_seguidores: 124,
+  perdidos: 19
+};
+
+const IG_POSTS = [
+  { tipo:'Carrusel', titulo:'Ayer Progreso se pintó de naranja 🟠🔥', fecha:'lun 6 abr', vis:2579, alcance:11, inter:159 },
+  { tipo:'Reel',     titulo:'Las mejores historias no se cuentan. Se viven entre risas…', fecha:'mié 8 abr', vis:807, alcance:603, inter:52 },
+  { tipo:'Historia', titulo:'(Historia)', fecha:'dom 5 abr 18:24', vis:263, alcance:171, inter:6 },
+  { tipo:'Historia', titulo:'(Historia)', fecha:'dom 5 abr 21:00', vis:206, alcance:159, inter:2 },
+  { tipo:'Historia', titulo:'(Historia)', fecha:'jue 9 abr', vis:79, alcance:0, inter:1 },
+  { tipo:'Historia', titulo:'(Historia)', fecha:'vie 12 mar', vis:277, alcance:200, inter:3 },
+  { tipo:'Historia', titulo:'(Historia)', fecha:'sáb 13 mar', vis:211, alcance:162, inter:2 },
+  { tipo:'Historia', titulo:'(Historia)', fecha:'dom 14 mar', vis:189, alcance:143, inter:1 },
+  { tipo:'Reel',     titulo:'Las mejores historias de Semana Santa…', fecha:'mié 8 abr', vis:10, alcance:8, inter:2 }
+].sort((a,b)=>b.vis-a.vis);
+
+function renderIG() {
+  // KPIs
+  const net = IG_ACCOUNT.nuevos_seguidores - IG_ACCOUNT.perdidos;
+  $('ig-kpis').innerHTML = `
+    <div class="kpi c-magenta"><div class="kpi-label">Visualizaciones</div><div class="kpi-value">${(IG_ACCOUNT.visualizaciones/1000).toFixed(1)}K</div><div class="kpi-sub">orgánico + pago</div></div>
+    <div class="kpi c-cyan"><div class="kpi-label">Alcance</div><div class="kpi-value">${(IG_ACCOUNT.alcance/1000).toFixed(1)}K</div><div class="kpi-sub">cuentas únicas</div></div>
+    <div class="kpi c-orange"><div class="kpi-label">Interacciones</div><div class="kpi-value">${(IG_ACCOUNT.interacciones/1000).toFixed(1)}K</div><div class="kpi-sub">totales</div></div>
+    <div class="kpi ${net>=0?'c-cyan':'c-rose'}"><div class="kpi-label">Crecimiento Neto</div><div class="kpi-value" style="color:${net>=0?'var(--cyan)':'var(--red)'}">${net>=0?'+':''}${net}</div><div class="kpi-sub">${IG_ACCOUNT.nuevos_seguidores} nuevos · ${IG_ACCOUNT.perdidos} perdidos</div></div>
+  `;
+  $('ig-period-label').textContent = `Período: ${IG_ACCOUNT.periodo}  ·  Datos de Meta Business Suite`;
+
+  // Posts table
+  const maxVis = Math.max(...IG_POSTS.map(p=>p.vis));
+  $('ig-posts-body').innerHTML = IG_POSTS.map(p=>`
+    <tr>
+      <td><span class="ig-tipo ${p.tipo}">${p.tipo}</span></td>
+      <td style="max-width:280px;color:var(--gray-300)">${p.titulo}</td>
+      <td style="color:var(--gray-500);white-space:nowrap">${p.fecha}</td>
+      <td>
+        <div class="ig-bar-wrap">
+          <span style="min-width:44px;font-weight:600;color:var(--white)">${p.vis>=1000?(p.vis/1000).toFixed(1)+'K':p.vis}</span>
+          <div class="ig-bar"><div class="ig-bar-fill" style="width:${Math.round(p.vis/maxVis*100)}%"></div></div>
+        </div>
+      </td>
+      <td style="color:var(--gray-300)">${p.alcance>0?p.alcance:'—'}</td>
+      <td style="color:var(--cyan);font-weight:600">${p.inter}</td>
+    </tr>
+  `).join('');
+
+  // Chart — visualizaciones por post (top 7)
+  const top = IG_POSTS.slice(0,7);
+  const ctx = document.getElementById('ig-chart');
+  if(ctx){
+    if(window._igChart) window._igChart.destroy();
+    window._igChart = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels: top.map(p=>p.titulo.substring(0,22)+'…'),
+        datasets:[
+          { label:'Visualizaciones', data:top.map(p=>p.vis), backgroundColor:'rgba(236,72,153,.7)', borderRadius:4 },
+          { label:'Alcance', data:top.map(p=>p.alcance), backgroundColor:'rgba(168,85,247,.5)', borderRadius:4 }
+        ]
+      },
+      options:{...BASE_OPTS, plugins:{...BASE_OPTS.plugins, legend:{display:true, labels:{color:'#9E9E9E',font:{size:11}}}}}
+    });
+  }
+
+  // Historical table from Google Sheets
+  const url = sheetCSV('InstagramOrganico');
+  fetch(url).then(r=>r.text()).then(csv=>{
+    const rows = Papa.parse(csv,{header:true,skipEmptyLines:true}).data;
+    if(!rows.length){ $('ig-history-table').innerHTML='<p style="color:var(--gray-600);font-size:12px">Sin datos históricos aún. Agrega snapshots semanales en la pestaña <strong>InstagramOrganico</strong> de Google Sheets.</p>'; return; }
+    const cols = Object.keys(rows[0]);
+    $('ig-history-table').innerHTML = `<div style="overflow-x:auto"><table class="ig-post-table">
+      <thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td style="color:var(--gray-300)">${r[c]||'—'}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table></div>`;
+  }).catch(()=>{ $('ig-history-table').innerHTML='<p style="color:var(--gray-600);font-size:12px">Crea la pestaña <strong>InstagramOrganico</strong> en Google Sheets para comenzar el control histórico.</p>'; });
+}
+
+// ═══════════════════════════════════════════════
 // MAIN INIT & AUTO-REFRESH
 // ═══════════════════════════════════════════════
 function renderAll(){
   destroyAll();
-  renderOverview(); renderMeta(); renderCreatives(); renderGA(); renderBudget(); renderInsights();
+  renderOverview(); renderMeta(); renderCreatives(); renderGA(); renderBudget(); renderInsights(); renderIG();
   $('lastUp').textContent='Actualizado: '+new Date().toLocaleTimeString('es-MX');
 }
 
