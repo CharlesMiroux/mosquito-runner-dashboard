@@ -1181,7 +1181,7 @@ function renderIG() {
           { label:'Alcance', data:top.map(p=>p.alcance), backgroundColor:'rgba(168,85,247,.5)', borderRadius:4 }
         ]
       },
-      options:{...BASE_OPTS, plugins:{...BASE_OPTS.plugins, legend:{display:true, labels:{color:'#9E9E9E',font:{size:11}}}}}
+      options:{...chartOpts, plugins:{...chartOpts.plugins, legend:{display:true, labels:{color:'#9E9E9E',font:{size:11}}}}}
     });
   }
 
