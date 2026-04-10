@@ -92,7 +92,8 @@
     .date-apply:hover{background:var(--orange-soft)}
 
     /* ── NAV TABS ── */
-    .nav{display:flex;gap:2px;padding:12px 32px 0;background:transparent}
+    .nav{display:flex;gap:2px;padding:12px 32px 0;background:transparent;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .nav::-webkit-scrollbar{display:none}
     .nav-tab{background:transparent;border:none;color:var(--gray-500);padding:12px 20px;border-radius:10px 10px 0 0;cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;transition:all .2s;position:relative}
     .nav-tab:hover{color:var(--gray-300);background:rgba(255,255,255,.03)}
     .nav-tab.active{color:var(--white);background:var(--card);font-weight:600}
@@ -161,22 +162,35 @@
 
     /* ── BUDGET ── */
     /* ── IG ORGANICO ── */
-    .ig-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+    .ig-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:14px;margin-bottom:20px}
     .ig-post-table{width:100%;border-collapse:collapse;font-size:12px}
-    .ig-post-table th{text-align:left;padding:10px 12px;color:var(--gray-500);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
-    .ig-post-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+    .ig-post-table th{text-align:left;padding:10px 12px;color:var(--gray-500);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+    .ig-post-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;white-space:nowrap}
     .ig-post-table tr:hover td{background:rgba(255,255,255,.015)}
     .ig-tipo{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
     .ig-tipo.Reel{background:rgba(236,72,153,.15);color:#EC4899}
     .ig-tipo.Historia{background:rgba(59,130,246,.15);color:#3B82F6}
     .ig-tipo.Carrusel{background:rgba(245,158,11,.15);color:#F59E0B}
     .ig-tipo.Post{background:rgba(132,204,22,.15);color:#84CC16}
+    .ig-tipo.Video{background:rgba(168,85,247,.15);color:#A855F7}
     .ig-bar-wrap{display:flex;align-items:center;gap:8px}
-    .ig-bar{height:5px;border-radius:3px;background:var(--surface);flex:1;overflow:hidden}
+    .ig-bar{height:5px;border-radius:3px;background:var(--surface);flex:1;overflow:hidden;min-width:50px}
     .ig-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--magenta),var(--purple))}
     .ig-snapshot-info{font-size:11px;color:var(--gray-500);margin-bottom:16px;display:flex;align-items:center;gap:6px}
-    .ig-snapshot-dot{width:6px;height:6px;border-radius:50%;background:var(--magenta)}
-    .ig-growth-chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:20px}
+    .ig-snapshot-dot{width:6px;height:6px;border-radius:50%;background:var(--magenta);animation:pulse 2s infinite}
+    .ig-growth-chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px}
+    .ig-charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+    @media(max-width:900px){.ig-charts-row{grid-template-columns:1fr}}
+    .ig-er-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+    .ig-er-badge.good{background:rgba(6,214,160,.12);color:var(--cyan)}
+    .ig-er-badge.ok{background:rgba(245,158,11,.12);color:var(--amber)}
+    .ig-er-badge.low{background:rgba(255,71,87,.12);color:var(--red)}
+    .ig-null{color:var(--gray-700)!important}
+    .ig-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-500);margin:24px 0 12px}
+    .ig-meta-row{display:flex;gap:24px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;font-size:12px}
+    .ig-meta-item{display:flex;flex-direction:column;gap:2px}
+    .ig-meta-label{color:var(--gray-500);font-size:11px}
+    .ig-meta-value{color:var(--white);font-weight:600;font-size:13px}
     .budget-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px}
     .budget-track{height:16px;background:var(--surface);border-radius:8px;overflow:hidden;margin:14px 0;position:relative}
     .budget-fill{height:100%;border-radius:8px;transition:width 1.5s cubic-bezier(.22,1,.36,1);background:linear-gradient(90deg,var(--orange),var(--amber));box-shadow:0 0 16px rgba(255,89,0,.3)}
@@ -457,9 +471,16 @@
               <th>Tipo</th>
               <th>Publicación</th>
               <th>Fecha</th>
-              <th>Visualizaciones</th>
+              <th>Vistas</th>
               <th>Alcance</th>
               <th>Interacciones</th>
+              <th>❤️ Likes</th>
+              <th>💬 Coment.</th>
+              <th>🔖 Guardados</th>
+              <th>↗ Compart.</th>
+              <th>👤 V. Perfil</th>
+              <th>➕ Nuevos Seg.</th>
+              <th>ER %</th>
             </tr>
           </thead>
           <tbody id="ig-posts-body"></tbody>
@@ -467,11 +488,18 @@
       </div>
     </div>
 
-    <!-- Growth Chart placeholder -->
-    <div class="ig-growth-chart-wrap">
-      <div class="chart-title">Evolución Histórica</div>
-      <div class="chart-sub" style="margin-bottom:16px">Visualizaciones y alcance por fecha de publicación</div>
-      <div style="position:relative;height:220px"><canvas id="ig-chart"></canvas></div>
+    <!-- Charts row -->
+    <div class="ig-charts-row">
+      <div class="ig-growth-chart-wrap">
+        <div class="chart-title">Visualizaciones por contenido</div>
+        <div class="chart-sub" style="margin-bottom:16px">Top 7 publicaciones — vistas vs alcance</div>
+        <div style="position:relative;height:220px"><canvas id="ig-chart"></canvas></div>
+      </div>
+      <div class="ig-growth-chart-wrap">
+        <div class="chart-title">Engagement Rate por contenido</div>
+        <div class="chart-sub" style="margin-bottom:16px">ER% = interacciones / alcance · <span style="color:var(--cyan)">≥3% bueno</span> · <span style="color:var(--amber)">1-3% ok</span> · <span style="color:var(--red)">&#60;1% bajo</span></div>
+        <div style="position:relative;height:220px"><canvas id="ig-er-chart"></canvas></div>
+      </div>
     </div>
 
     <!-- Historical snapshots table -->
@@ -866,7 +894,7 @@ function renderMeta(){
     <td><span class="badge ${c.st==='ACTIVE'?'active':'paused'}">${c.st}</span></td>
     <td style="color:var(--orange);font-weight:600">${M(c.spend)}</td>
     <td>${N(c.reach)}</td><td>${N(c.imp)}</td><td>${N(c.clicks)}</td>
-    <td style="color:${c.ctr>3?'var(--cyan)':c.ctr>1.5?'var(--blue)':'var(--red)'};font-weight:600">${P(c.ctr)}</td>
+    <td style="color:${c.ctr>3?'var(--cyan)':c.ctr>1.5?'var(--blue)':'var(--red)'}; font-weight:600">${P(c.ctr)}</td>
     <td style="color:${c.cpc>3?'var(--red)':c.cpc>1.5?'var(--amber)':'var(--cyan)'}">${M(c.cpc)}</td>
     <td>${M(c.cpm)}</td>
     <td>${c.freq}</td>
@@ -1119,83 +1147,185 @@ function filterC(q){document.querySelectorAll('#camp-tb tr').forEach(r=>{r.style
 // ═══════════════════════════════════════════════
 const IG_ACCOUNT = {
   periodo: '12 mar 2026 – 8 abr 2026',
+  seguidores_total: null,        // actualizar con total actual
   visualizaciones: 49700,
   alcance: 34600,
   interacciones: 1100,
+  visitas_perfil: null,          // obtener de Meta Business Suite
   nuevos_seguidores: 124,
   perdidos: 19
 };
 
+// Fallback hardcoded — se reemplaza con datos de la hoja IG_Posts en Google Sheets
+// Columnas: tipo, titulo, fecha, vis, alcance, inter, likes, comentarios, guardados, compartidos, visitas_perf, nuevos_seg
 const IG_POSTS = [
-  { tipo:'Carrusel', titulo:'Ayer Progreso se pintó de naranja 🟠🔥', fecha:'lun 6 abr', vis:2579, alcance:11, inter:159 },
-  { tipo:'Reel',     titulo:'Las mejores historias no se cuentan. Se viven entre risas…', fecha:'mié 8 abr', vis:807, alcance:603, inter:52 },
-  { tipo:'Historia', titulo:'(Historia)', fecha:'dom 5 abr 18:24', vis:263, alcance:171, inter:6 },
-  { tipo:'Historia', titulo:'(Historia)', fecha:'dom 5 abr 21:00', vis:206, alcance:159, inter:2 },
-  { tipo:'Historia', titulo:'(Historia)', fecha:'jue 9 abr', vis:79, alcance:0, inter:1 },
-  { tipo:'Historia', titulo:'(Historia)', fecha:'vie 12 mar', vis:277, alcance:200, inter:3 },
-  { tipo:'Historia', titulo:'(Historia)', fecha:'sáb 13 mar', vis:211, alcance:162, inter:2 },
-  { tipo:'Historia', titulo:'(Historia)', fecha:'dom 14 mar', vis:189, alcance:143, inter:1 },
-  { tipo:'Reel',     titulo:'Las mejores historias de Semana Santa…', fecha:'mié 8 abr', vis:10, alcance:8, inter:2 }
+  { tipo:'Carrusel', titulo:'Ayer Progreso se pintó de naranja 🟠🔥',               fecha:'lun 6 abr',        vis:2579, alcance:1100, inter:159, likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Reel',     titulo:'Las mejores historias no se cuentan. Se viven entre risas…', fecha:'mié 8 abr',   vis:807,  alcance:603,  inter:52,  likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Historia', titulo:'(Historia)',                                            fecha:'dom 5 abr 18:24',  vis:263,  alcance:171,  inter:6,   likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Historia', titulo:'(Historia)',                                            fecha:'dom 5 abr 21:00',  vis:206,  alcance:159,  inter:2,   likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Historia', titulo:'(Historia)',                                            fecha:'vie 12 mar',       vis:277,  alcance:200,  inter:3,   likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Historia', titulo:'(Historia)',                                            fecha:'sáb 13 mar',       vis:211,  alcance:162,  inter:2,   likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Historia', titulo:'(Historia)',                                            fecha:'dom 14 mar',       vis:189,  alcance:143,  inter:1,   likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Historia', titulo:'(Historia)',                                            fecha:'jue 9 abr',        vis:79,   alcance:0,    inter:1,   likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
+  { tipo:'Reel',     titulo:'Las mejores historias de Semana Santa…',               fecha:'mié 8 abr',        vis:10,   alcance:8,    inter:2,   likes:null, comentarios:null, guardados:null, compartidos:null, visitas_perf:null, nuevos_seg:null },
 ].sort((a,b)=>b.vis-a.vis);
 
 function renderIG() {
-  // KPIs
+  // ── helpers
+  const fmtK = v => (v==null||v==='') ? '—' : (+v>=1000 ? (+v/1000).toFixed(1)+'K' : +v);
+  const fmtN = v => (v==null||v===''||v==='null') ? '<span class="ig-null">—</span>' : v;
+  const erBadge = (inter,alc) => {
+    if(!alc||alc<=0) return '<span class="ig-null">—</span>';
+    const e = ((+inter/+alc)*100).toFixed(2);
+    const cls = e>=3?'good':e>=1?'ok':'low';
+    return `<span class="ig-er-badge ${cls}">${e}%</span>`;
+  };
+
+  // ── KPIs (6 cards)
   const net = IG_ACCOUNT.nuevos_seguidores - IG_ACCOUNT.perdidos;
+  const acctEr = IG_ACCOUNT.alcance>0 ? ((IG_ACCOUNT.interacciones/IG_ACCOUNT.alcance)*100).toFixed(2) : null;
   $('ig-kpis').innerHTML = `
-    <div class="kpi c-magenta"><div class="kpi-label">Visualizaciones</div><div class="kpi-value">${(IG_ACCOUNT.visualizaciones/1000).toFixed(1)}K</div><div class="kpi-sub">orgánico + pago</div></div>
-    <div class="kpi c-cyan"><div class="kpi-label">Alcance</div><div class="kpi-value">${(IG_ACCOUNT.alcance/1000).toFixed(1)}K</div><div class="kpi-sub">cuentas únicas</div></div>
-    <div class="kpi c-orange"><div class="kpi-label">Interacciones</div><div class="kpi-value">${(IG_ACCOUNT.interacciones/1000).toFixed(1)}K</div><div class="kpi-sub">totales</div></div>
-    <div class="kpi ${net>=0?'c-cyan':'c-rose'}"><div class="kpi-label">Crecimiento Neto</div><div class="kpi-value" style="color:${net>=0?'var(--cyan)':'var(--red)'}">${net>=0?'+':''}${net}</div><div class="kpi-sub">${IG_ACCOUNT.nuevos_seguidores} nuevos · ${IG_ACCOUNT.perdidos} perdidos</div></div>
+    <div class="kpi c-magenta">
+      <div class="kpi-label">Visualizaciones</div>
+      <div class="kpi-value">${fmtK(IG_ACCOUNT.visualizaciones)}</div>
+      <div class="kpi-sub">total del período</div>
+    </div>
+    <div class="kpi c-cyan">
+      <div class="kpi-label">Alcance</div>
+      <div class="kpi-value">${fmtK(IG_ACCOUNT.alcance)}</div>
+      <div class="kpi-sub">cuentas únicas alcanzadas</div>
+    </div>
+    <div class="kpi c-orange">
+      <div class="kpi-label">Interacciones</div>
+      <div class="kpi-value">${fmtK(IG_ACCOUNT.interacciones)}</div>
+      <div class="kpi-sub">likes + coment. + guardados</div>
+    </div>
+    <div class="kpi c-blue">
+      <div class="kpi-label">Visitas al Perfil</div>
+      <div class="kpi-value">${fmtK(IG_ACCOUNT.visitas_perfil)}</div>
+      <div class="kpi-sub">desde publicaciones</div>
+    </div>
+    <div class="kpi ${net>=0?'c-cyan':'c-rose'}">
+      <div class="kpi-label">Crecimiento Neto</div>
+      <div class="kpi-value" style="color:${net>=0?'var(--cyan)':'var(--red)'}">${net>=0?'+':''}${net}</div>
+      <div class="kpi-sub">${IG_ACCOUNT.nuevos_seguidores} nuevos · ${IG_ACCOUNT.perdidos} perdidos</div>
+    </div>
+    <div class="kpi c-purple">
+      <div class="kpi-label">Engagement Rate</div>
+      <div class="kpi-value">${acctEr!=null?acctEr+'%':'—'}</div>
+      <div class="kpi-sub">interacciones / alcance</div>
+    </div>
   `;
   $('ig-period-label').textContent = `Período: ${IG_ACCOUNT.periodo}  ·  Datos de Meta Business Suite`;
 
-  // Posts table
-  const maxVis = Math.max(...IG_POSTS.map(p=>p.vis));
-  $('ig-posts-body').innerHTML = IG_POSTS.map(p=>`
-    <tr>
-      <td><span class="ig-tipo ${p.tipo}">${p.tipo}</span></td>
-      <td style="max-width:280px;color:var(--gray-300)">${p.titulo}</td>
-      <td style="color:var(--gray-500);white-space:nowrap">${p.fecha}</td>
-      <td>
-        <div class="ig-bar-wrap">
-          <span style="min-width:44px;font-weight:600;color:var(--white)">${p.vis>=1000?(p.vis/1000).toFixed(1)+'K':p.vis}</span>
-          <div class="ig-bar"><div class="ig-bar-fill" style="width:${Math.round(p.vis/maxVis*100)}%"></div></div>
-        </div>
-      </td>
-      <td style="color:var(--gray-300)">${p.alcance>0?p.alcance:'—'}</td>
-      <td style="color:var(--cyan);font-weight:600">${p.inter}</td>
-    </tr>
-  `).join('');
+  // ── render posts table + charts from a posts array
+  const renderPostsAndCharts = posts => {
+    const maxVis = Math.max(...posts.map(p=>+p.vis||0), 1);
+    $('ig-posts-body').innerHTML = posts.map(p => {
+      const vis  = +p.vis  || 0;
+      const alc  = +p.alcance || 0;
+      const inte = +p.inter || 0;
+      return `<tr>
+        <td><span class="ig-tipo ${p.tipo}">${p.tipo}</span></td>
+        <td style="max-width:200px;color:var(--gray-300);white-space:normal;line-height:1.35">${p.titulo}</td>
+        <td style="color:var(--gray-500)">${p.fecha}</td>
+        <td><div class="ig-bar-wrap">
+          <span style="min-width:44px;font-weight:600;color:var(--white)">${fmtK(vis)}</span>
+          <div class="ig-bar"><div class="ig-bar-fill" style="width:${Math.round(vis/maxVis*100)}%"></div></div>
+        </div></td>
+        <td style="color:var(--gray-300)">${alc>0?fmtK(alc):'<span class="ig-null">—</span>'}</td>
+        <td style="color:var(--cyan);font-weight:600">${inte}</td>
+        <td style="color:var(--gray-400)">${fmtN(p.likes)}</td>
+        <td style="color:var(--gray-400)">${fmtN(p.comentarios)}</td>
+        <td style="color:var(--amber)">${fmtN(p.guardados)}</td>
+        <td style="color:var(--gray-400)">${fmtN(p.compartidos)}</td>
+        <td style="color:var(--blue)">${fmtN(p.visitas_perf)}</td>
+        <td style="color:var(--green)">${fmtN(p.nuevos_seg)}</td>
+        <td>${erBadge(inte,alc)}</td>
+      </tr>`;
+    }).join('');
 
-  // Chart — visualizaciones por post (top 7)
-  const top = IG_POSTS.slice(0,7);
-  const ctx = document.getElementById('ig-chart');
-  if(ctx){
-    if(window._igChart) window._igChart.destroy();
-    window._igChart = new Chart(ctx, {
-      type:'bar',
-      data:{
-        labels: top.map(p=>p.titulo.substring(0,22)+'…'),
-        datasets:[
-          { label:'Visualizaciones', data:top.map(p=>p.vis), backgroundColor:'rgba(236,72,153,.7)', borderRadius:4 },
-          { label:'Alcance', data:top.map(p=>p.alcance), backgroundColor:'rgba(168,85,247,.5)', borderRadius:4 }
-        ]
-      },
-      options:{...chartOpts, plugins:{...chartOpts.plugins, legend:{display:true, labels:{color:'#9E9E9E',font:{size:11}}}}}
-    });
-  }
+    // chart A — visualizaciones + alcance
+    const top7 = posts.slice(0,7);
+    const labels7 = top7.map(p=>p.titulo.substring(0,18)+'…');
+    const ctxA = document.getElementById('ig-chart');
+    if(ctxA){
+      if(window._igChart) window._igChart.destroy();
+      window._igChart = new Chart(ctxA, {
+        type:'bar',
+        data:{
+          labels:labels7,
+          datasets:[
+            {label:'Visualizaciones', data:top7.map(p=>+p.vis||0),    backgroundColor:'rgba(236,72,153,.7)', borderRadius:4},
+            {label:'Alcance',         data:top7.map(p=>+p.alcance||0), backgroundColor:'rgba(168,85,247,.5)', borderRadius:4}
+          ]
+        },
+        options:{...chartOpts, plugins:{...chartOpts.plugins, legend:{display:true, labels:{color:'#9E9E9E',font:{size:11}}}}}
+      });
+    }
 
-  // Historical table from Google Sheets
-  const url = sheetCSV('InstagramOrganico');
-  fetch(url).then(r=>r.text()).then(csv=>{
+    // chart B — engagement rate
+    const topEr = posts.filter(p=>+p.alcance>0).slice(0,7);
+    const ctxB = document.getElementById('ig-er-chart');
+    if(ctxB){
+      if(window._igErChart) window._igErChart.destroy();
+      const erVals = topEr.map(p=>+((+p.inter/+p.alcance)*100).toFixed(2));
+      window._igErChart = new Chart(ctxB, {
+        type:'bar',
+        data:{
+          labels:topEr.map(p=>p.titulo.substring(0,18)+'…'),
+          datasets:[{
+            label:'ER %',
+            data:erVals,
+            backgroundColor:erVals.map(e=>e>=3?'rgba(6,214,160,.7)':e>=1?'rgba(245,158,11,.7)':'rgba(255,71,87,.6)'),
+            borderRadius:4
+          }]
+        },
+        options:{...chartOpts, plugins:{...chartOpts.plugins, legend:{display:false}}}
+      });
+    }
+  };
+
+  // ── try IG_Posts sheet first, fallback to hardcoded
+  fetch(sheetCSV('IG_Posts')).then(r=>r.text()).then(csv=>{
     const rows = Papa.parse(csv,{header:true,skipEmptyLines:true}).data;
-    if(!rows.length){ $('ig-history-table').innerHTML='<p style="color:var(--gray-600);font-size:12px">Sin datos históricos aún. Agrega snapshots semanales en la pestaña <strong>InstagramOrganico</strong> de Google Sheets.</p>'; return; }
+    if(rows.length){
+      const mapped = rows.map(r=>({
+        tipo:         r.tipo||'Post',
+        titulo:       r.descripcion||r.titulo||'—',
+        fecha:        r.fecha||r.fecha_publicacion||'—',
+        vis:          +r.visualizaciones||0,
+        alcance:      +r.alcance||0,
+        inter:        +r.interacciones||0,
+        likes:        r.likes!==undefined&&r.likes!==''?r.likes:null,
+        comentarios:  r.comentarios!==undefined&&r.comentarios!==''?r.comentarios:null,
+        guardados:    r.guardados!==undefined&&r.guardados!==''?r.guardados:null,
+        compartidos:  r.compartidos!==undefined&&r.compartidos!==''?r.compartidos:null,
+        visitas_perf: r.visitas_perfil!==undefined&&r.visitas_perfil!==''?r.visitas_perfil:null,
+        nuevos_seg:   r.nuevos_seguidores!==undefined&&r.nuevos_seguidores!==''?r.nuevos_seguidores:null
+      })).sort((a,b)=>b.vis-a.vis);
+      renderPostsAndCharts(mapped);
+    } else {
+      renderPostsAndCharts(IG_POSTS);
+    }
+  }).catch(()=>renderPostsAndCharts(IG_POSTS));
+
+  // ── historical account snapshots from InstagramOrganico sheet
+  fetch(sheetCSV('InstagramOrganico')).then(r=>r.text()).then(csv=>{
+    const rows = Papa.parse(csv,{header:true,skipEmptyLines:true}).data;
+    if(!rows.length){
+      $('ig-history-table').innerHTML='<p style="color:var(--gray-600);font-size:12px">Sin datos históricos aún. Agrega snapshots periódicos en la pestaña <strong>InstagramOrganico</strong> de Google Sheets.</p>';
+      return;
+    }
     const cols = Object.keys(rows[0]);
+    const label = c => c.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
     $('ig-history-table').innerHTML = `<div style="overflow-x:auto"><table class="ig-post-table">
-      <thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+      <thead><tr>${cols.map(c=>`<th>${label(c)}</th>`).join('')}</tr></thead>
       <tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td style="color:var(--gray-300)">${r[c]||'—'}</td>`).join('')}</tr>`).join('')}</tbody>
     </table></div>`;
-  }).catch(()=>{ $('ig-history-table').innerHTML='<p style="color:var(--gray-600);font-size:12px">Crea la pestaña <strong>InstagramOrganico</strong> en Google Sheets para comenzar el control histórico.</p>'; });
+  }).catch(()=>{
+    $('ig-history-table').innerHTML='<p style="color:var(--gray-600);font-size:12px">Crea la pestaña <strong>InstagramOrganico</strong> en Google Sheets para comenzar el control histórico.</p>';
+  });
 }
 
 // ═══════════════════════════════════════════════
