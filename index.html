@@ -587,8 +587,20 @@ async function fetchCSV(sheetName) {
 }
 
 async function fetchMetaAds() {
+  // Tab naming convention: MetaAds_7d, MetaAds_14d, MetaAds_30d, MetaAds_90d
+  // Falls back to Sheet1 (legacy) or MetaAds if period-specific tab doesn't exist
+  const periodTab = currentDays === 30 ? 'MetaAds' : `MetaAds_${currentDays}d`;
+  let rows = null;
+  for (const tabName of [periodTab, 'MetaAds', 'Sheet1']) {
+    try {
+      const r = await fetchCSV(tabName);
+      if (r && r.length > 0 && (r[0]['Campaign'] || r[0]['campaign'])) {
+        rows = r;
+        break;
+      }
+    } catch(e) { /* try next tab */ }
+  }
   try {
-    const rows = await fetchCSV('Sheet1');
     if (!rows || rows.length === 0) throw new Error('No data');
 
     const campaigns = [];
@@ -614,12 +626,11 @@ async function fetchMetaAds() {
       return true;
     }
   } catch (e) {
-    console.log('MetaAds fetch failed, using defaults:', e.message);
+    console.log('MetaAds fetch failed:', e.message);
   }
   ALL_CAMPAIGNS = [...DEFAULT_CAMPAIGNS];
   return false;
 }
-
 async function fetchGA4() {
   try {
     const rows = await fetchCSV('GA4');
@@ -770,25 +781,25 @@ function setPeriod(days, btn) {
   document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   currentDays = days;
-  const to = new Date('2026-03-31');
-  const from = new Date(to); from.setDate(from.getDate() - days + 1);
-  customFrom = from < new Date('2026-03-02') ? new Date('2026-03-02') : from;
+  // Calculate date range relative to today
+  const to = new Date();
+  to.setHours(0,0,0,0);
+  const from = new Date(to);
+  from.setDate(from.getDate() - days + 1);
+  customFrom = from;
   customTo = to;
   document.getElementById('dateFrom').value = fmt(customFrom);
   document.getElementById('dateTo').value = fmt(customTo);
-  renderAll();
+  // Refetch data for the new period (looks for MetaAds_7d, MetaAds_14d, etc.)
+  loadAllData().then(() => renderAll());
 }
-
 function applyCustomDate() {
   document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
   customFrom = new Date(document.getElementById('dateFrom').value + 'T00:00:00');
   customTo = new Date(document.getElementById('dateTo').value + 'T00:00:00');
-  if (customFrom < new Date('2026-03-02')) customFrom = new Date('2026-03-02');
-  if (customTo > new Date('2026-03-31')) customTo = new Date('2026-03-31');
   currentDays = Math.round((customTo - customFrom) / 86400000) + 1;
-  renderAll();
+  loadAllData().then(() => renderAll());
 }
-
 function fmt(d) { return d.toISOString().split('T')[0]; }
 
 function getFilteredDaily() {
