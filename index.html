@@ -632,17 +632,22 @@ async function fetchMetaAds() {
   return false;
 }
 async function fetchGA4() {
+  const periodTab = currentDays === 30 ? 'GA4' : `GA4_${currentDays}d`;
+  let rows = null;
+  for (const tabName of [periodTab, 'GA4']) {
+    try {
+      const r = await fetchCSV(tabName);
+      if (r && r.length > 0 && (r[0]['Metric'] || r[0]['metric'])) { rows = r; break; }
+    } catch(e) { /* try next */ }
+  }
+  if (!rows || rows.length === 0) { GA = {...DEFAULT_GA}; return false; }
   try {
-    const rows = await fetchCSV('GA4');
-    if (!rows || rows.length === 0) throw new Error('No GA4 sheet');
-
     const metrics = {};
     rows.forEach(row => {
       const key = (row['Metric'] || row['metric'] || '').toLowerCase().trim();
       const val = row['Value'] || row['value'];
       if (key && val !== undefined) metrics[key] = val;
     });
-
     if (Object.keys(metrics).length > 0) {
       GA = {
         sessions: parseInt(metrics['sessions'] || metrics['sesiones'] || DEFAULT_GA.sessions),
@@ -654,17 +659,21 @@ async function fetchGA4() {
       };
       return true;
     }
-  } catch (e) {
-    console.log('GA4 fetch failed, using defaults:', e.message);
-  }
+  } catch (e) { console.log('GA4 fetch failed:', e.message); }
   GA = {...DEFAULT_GA};
   return false;
 }
-
 async function fetchChannels() {
+  const periodTab = currentDays === 30 ? 'Channels' : `Channels_${currentDays}d`;
+  let rows = null;
+  for (const tabName of [periodTab, 'Channels']) {
+    try {
+      const r = await fetchCSV(tabName);
+      if (r && r.length > 0 && (r[0]['Channel'] || r[0]['channel'] || r[0]['Canal'])) { rows = r; break; }
+    } catch(e) { /* try next */ }
+  }
+  if (!rows || rows.length === 0) { GA_CHANNELS = [...DEFAULT_GA_CHANNELS]; return false; }
   try {
-    const rows = await fetchCSV('Channels');
-    if (!rows || rows.length === 0) throw new Error('No Channels sheet');
     const CHANNEL_COLORS = {'organic search':'#06D6A0','direct':'#3B82F6','organic social':'#A855F7','paid social':'#FF5900','referral':'#EC4899','email':'#F59E0B','display':'#14B8A6'};
     const channels = [];
     rows.forEach(row => {
@@ -680,11 +689,17 @@ async function fetchChannels() {
   GA_CHANNELS = [...DEFAULT_GA_CHANNELS];
   return false;
 }
-
 async function fetchPages() {
+  const periodTab = currentDays === 30 ? 'Pages' : `Pages_${currentDays}d`;
+  let rows = null;
+  for (const tabName of [periodTab, 'Pages']) {
+    try {
+      const r = await fetchCSV(tabName);
+      if (r && r.length > 0 && (r[0]['Page'] || r[0]['page'] || r[0]['Pagina'] || r[0]['Title'])) { rows = r; break; }
+    } catch(e) { /* try next */ }
+  }
+  if (!rows || rows.length === 0) { GA_PAGES = [...DEFAULT_GA_PAGES]; return false; }
   try {
-    const rows = await fetchCSV('Pages');
-    if (!rows || rows.length === 0) throw new Error('No Pages sheet');
     const pages = [];
     rows.forEach(row => {
       const title = row['Page'] || row['page'] || row['Pagina'] || row['Title'] || '';
@@ -699,6 +714,40 @@ async function fetchPages() {
   return false;
 }
 
+async function fetchIGAccount() {
+  const periodTab = currentDays === 30 ? 'IG_Account' : `IG_Account_${currentDays}d`;
+  let rows = null;
+  for (const tabName of [periodTab, 'IG_Account']) {
+    try {
+      const r = await fetchCSV(tabName);
+      if (r && r.length > 0 && (r[0]['Metric'] || r[0]['metric'] || r[0]['Metrica'])) { rows = r; break; }
+    } catch(e) { /* try next */ }
+  }
+  if (!rows || rows.length === 0) { IG_ACCOUNT = { ...IG_ACCOUNT_DEFAULT }; return false; }
+  try {
+    const m = {};
+    rows.forEach(row => {
+      const key = (row['Metric'] || row['metric'] || row['Metrica'] || '').toLowerCase().trim();
+      const val = row['Value'] || row['value'] || row['Valor'];
+      if (key && val !== undefined && val !== '') m[key] = val;
+    });
+    if (Object.keys(m).length > 0) {
+      IG_ACCOUNT = {
+        periodo:           m['periodo'] || m['period'] || IG_ACCOUNT_DEFAULT.periodo,
+        seguidores_total:  m['seguidores_total']  != null ? +m['seguidores_total']  : IG_ACCOUNT_DEFAULT.seguidores_total,
+        visualizaciones:   m['visualizaciones']   != null ? +m['visualizaciones']   : IG_ACCOUNT_DEFAULT.visualizaciones,
+        alcance:           m['alcance']            != null ? +m['alcance']           : IG_ACCOUNT_DEFAULT.alcance,
+        interacciones:     m['interacciones']      != null ? +m['interacciones']     : IG_ACCOUNT_DEFAULT.interacciones,
+        visitas_perfil:    m['visitas_perfil']     != null ? +m['visitas_perfil']    : IG_ACCOUNT_DEFAULT.visitas_perfil,
+        nuevos_seguidores: m['nuevos_seguidores']  != null ? +m['nuevos_seguidores'] : IG_ACCOUNT_DEFAULT.nuevos_seguidores,
+        perdidos:          m['perdidos']           != null ? +m['perdidos']          : IG_ACCOUNT_DEFAULT.perdidos
+      };
+      return true;
+    }
+  } catch(e) { console.log('IG_Account fetch failed:', e.message); }
+  IG_ACCOUNT = { ...IG_ACCOUNT_DEFAULT };
+  return false;
+}
 async function fetchConfig() {
   try {
     const rows = await fetchCSV('Config');
@@ -723,7 +772,8 @@ async function loadAllData() {
     fetchGA4(),
     fetchChannels(),
     fetchPages(),
-    fetchConfig()
+    fetchConfig(),
+    fetchIGAccount()
   ]);
 
   // Check if MetaAds (primary) loaded from live
@@ -1162,17 +1212,17 @@ function filterC(q){document.querySelectorAll('#camp-tb tr').forEach(r=>{r.style
 // ═══════════════════════════════════════════════
 // IG ORGÁNICO — datos hardcoded + Google Sheets histórico
 // ═══════════════════════════════════════════════
-const IG_ACCOUNT = {
+let IG_ACCOUNT = {
   periodo: '12 mar 2026 – 8 abr 2026',
-  seguidores_total: null,        // actualizar con total actual
+  seguidores_total: null,
   visualizaciones: 49700,
   alcance: 34600,
   interacciones: 1100,
-  visitas_perfil: null,          // obtener de Meta Business Suite
+  visitas_perfil: null,
   nuevos_seguidores: 124,
   perdidos: 19
 };
-
+const IG_ACCOUNT_DEFAULT = { ...IG_ACCOUNT };
 // Fallback hardcoded — se reemplaza con datos de la hoja IG_Posts en Google Sheets
 // Columnas: tipo, titulo, fecha, vis, alcance, inter, likes, comentarios, guardados, compartidos, visitas_perf, nuevos_seg
 const IG_POSTS = [
@@ -1303,29 +1353,31 @@ function renderIG() {
     }
   };
 
-  // ── try IG_Posts sheet first, fallback to hardcoded
-  fetch(sheetCSV('IG_Posts')).then(r=>r.text()).then(csv=>{
-    const rows = Papa.parse(csv,{header:true,skipEmptyLines:true}).data;
-    if(rows.length){
-      const mapped = rows.map(r=>({
-        tipo:         r.tipo||'Post',
-        titulo:       r.descripcion||r.titulo||'—',
-        fecha:        r.fecha||r.fecha_publicacion||'—',
-        vis:          +r.visualizaciones||0,
-        alcance:      +r.alcance||0,
-        inter:        +r.interacciones||0,
-        likes:        r.likes!==undefined&&r.likes!==''?r.likes:null,
-        comentarios:  r.comentarios!==undefined&&r.comentarios!==''?r.comentarios:null,
-        guardados:    r.guardados!==undefined&&r.guardados!==''?r.guardados:null,
-        compartidos:  r.compartidos!==undefined&&r.compartidos!==''?r.compartidos:null,
-        visitas_perf: r.visitas_perfil!==undefined&&r.visitas_perfil!==''?r.visitas_perfil:null,
-        nuevos_seg:   r.nuevos_seguidores!==undefined&&r.nuevos_seguidores!==''?r.nuevos_seguidores:null
-      })).sort((a,b)=>b.vis-a.vis);
-      renderPostsAndCharts(mapped);
-    } else {
-      renderPostsAndCharts(IG_POSTS);
-    }
-  }).catch(()=>renderPostsAndCharts(IG_POSTS));
+  // ── try period-specific IG_Posts sheet first, fallback to IG_Posts / hardcoded
+  const igPostsTab = currentDays === 30 ? 'IG_Posts' : `IG_Posts_${currentDays}d`;
+  const mapIGRows = rows => rows.map(r=>({
+    tipo:         r.tipo||'Post',
+    titulo:       r.descripcion||r.titulo||'—',
+    fecha:        r.fecha||r.fecha_publicacion||'—',
+    vis:          +r.visualizaciones||0,
+    alcance:      +r.alcance||0,
+    inter:        +r.interacciones||0,
+    likes:        r.likes!==undefined&&r.likes!==''?r.likes:null,
+    comentarios:  r.comentarios!==undefined&&r.comentarios!==''?r.comentarios:null,
+    guardados:    r.guardados!==undefined&&r.guardados!==''?r.guardados:null,
+    compartidos:  r.compartidos!==undefined&&r.compartidos!==''?r.compartidos:null,
+    visitas_perf: r.visitas_perfil!==undefined&&r.visitas_perfil!==''?r.visitas_perfil:null,
+    nuevos_seg:   r.nuevos_seguidores!==undefined&&r.nuevos_seguidores!==''?r.nuevos_seguidores:null
+  })).sort((a,b)=>b.vis-a.vis);
+  const tryPost = (tabs, fallback) => {
+    if (!tabs.length) { renderPostsAndCharts(fallback); return; }
+    const [tab, ...rest] = tabs;
+    fetch(sheetCSV(tab)).then(r=>r.text()).then(csv=>{
+      const rows = Papa.parse(csv,{header:true,skipEmptyLines:true}).data;
+      rows.length ? renderPostsAndCharts(mapIGRows(rows)) : tryPost(rest, fallback);
+    }).catch(()=>tryPost(rest, fallback));
+  };
+  tryPost([igPostsTab, 'IG_Posts'], IG_POSTS);  }).catch(()=>renderPostsAndCharts(IG_POSTS));
 
   // ── historical account snapshots from InstagramOrganico sheet
   fetch(sheetCSV('InstagramOrganico')).then(r=>r.text()).then(csv=>{
